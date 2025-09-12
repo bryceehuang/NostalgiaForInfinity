@@ -71,18 +71,15 @@ else
   STRATEGY_NAME_CONFIG=${STRATEGY_NAME}
 fi
 
-# Strategy version extraction
-STRATEGY_VERSION=""
+export STRATEGY_VERSION=$(grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2)
+
+# Strategy Config
 STRATEGY_VERSION_CONFIG=""
-if [[ -f "$STRATEGY_NAME_CONFIG.py" ]]; then
-  export STRATEGY_VERSION=$(grep version "$STRATEGY_NAME_CONFIG.py" -A 1 | grep return | cut -d '"' -f 2)
-  STRATEGY_VERSION_CONFIG=$(echo "$STRATEGY_VERSION" | sed "s/\./-/g")
-elif [[ -f "user_data/strategies/$STRATEGY_NAME_CONFIG.py" ]]; then
-  export STRATEGY_VERSION=$(grep version "user_data/strategies/$STRATEGY_NAME_CONFIG.py" -A 1 | grep return | cut -d '"' -f 2)
-  STRATEGY_VERSION_CONFIG=$(echo "$STRATEGY_VERSION" | sed "s/\./-/g")
+if [[ -z ${STRATEGY_VERSION} ]]; then
+  STRATEGY_VERSION_CONFIG="$(date -r $STRATEGY_NAME_CONFIG.py '+%Y_%m_%d-%H_%M')"
 else
-  echo "Error: Strategy file $STRATEGY_NAME_CONFIG.py not found in current directory or user_data/strategies/"
-  exit 1
+  grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2
+  STRATEGY_VERSION_CONFIG=$(grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2 | sed "s/\./-/g")
 fi
 
 echo "# Running Backtests on Focus Group(s)"
