@@ -69,7 +69,7 @@ class NostalgiaForInfinityX6(IStrategy):
   INTERFACE_VERSION = 3
 
   def version(self) -> str:
-    return "v16.7.137"
+    return "v16.7.147"
 
   stoploss = -0.99
 
@@ -121,7 +121,7 @@ class NostalgiaForInfinityX6(IStrategy):
   # Long rebuy mode tags
   long_rebuy_mode_tags = ["61", "62"]
   # Long high profit mode tags
-  long_mode_tags = ["81", "82"]
+  long_high_profit_mode_tags = ["81", "82"]
   # Long rapid mode tags
   long_rapid_mode_tags = ["101", "102", "103", "104", "105", "106", "107", "108", "109", "110"]
   # Long grind mode tags
@@ -152,7 +152,7 @@ class NostalgiaForInfinityX6(IStrategy):
   # Short rebuy mode tags
   short_rebuy_mode_tags = ["561"]
   # Short mode tags
-  short_mode_tags = ["581", "582"]
+  short_high_profit_mode_tags = ["581", "582"]
   # Short rapid mode tags
   short_rapid_mode_tags = ["601", "602", "603", "604", "605", "606", "607", "608", "609", "610"]
   # Short grind mode tags
@@ -1717,7 +1717,7 @@ class NostalgiaForInfinityX6(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long high profit mode
-    if any(c in self.long_mode_tags for c in enter_tags):
+    if any(c in self.long_high_profit_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_high_profit(
         pair,
         current_rate,
@@ -1965,7 +1965,7 @@ class NostalgiaForInfinityX6(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short high profit mode
-    if any(c in self.short_mode_tags for c in enter_tags):
+    if any(c in self.short_high_profit_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_high_profit(
         pair,
         current_rate,
@@ -2047,7 +2047,7 @@ class NostalgiaForInfinityX6(IStrategy):
       if sell and (signal_name is not None):
         return f"{signal_name} ( {enter_tag})"
 
-    # Trades not opened by X5
+    # Trades not opened by X6
     if not trade.is_short and (
       not any(
         c
@@ -2056,7 +2056,7 @@ class NostalgiaForInfinityX6(IStrategy):
           + self.long_pump_mode_tags
           + self.long_quick_mode_tags
           + self.long_rebuy_mode_tags
-          + self.long_mode_tags
+          + self.long_high_profit_mode_tags
           + self.long_rapid_mode_tags
           + self.long_grind_mode_tags
           + self.long_top_coins_mode_tags
@@ -2090,7 +2090,7 @@ class NostalgiaForInfinityX6(IStrategy):
       if sell and (signal_name is not None):
         return f"{signal_name} ( {enter_tag})"
 
-    # Trades not opened by X5
+    # Trades not opened by X6
     if trade.is_short and (
       not any(
         c
@@ -2099,7 +2099,7 @@ class NostalgiaForInfinityX6(IStrategy):
           + self.short_pump_mode_tags
           + self.short_quick_mode_tags
           + self.short_rebuy_mode_tags
-          + self.short_mode_tags
+          + self.short_high_profit_mode_tags
           + self.short_rapid_mode_tags
           + self.short_grind_mode_tags
           + self.short_scalp_mode_tags
@@ -2301,7 +2301,7 @@ class NostalgiaForInfinityX6(IStrategy):
           self.long_normal_mode_tags
           + self.long_pump_mode_tags
           + self.long_quick_mode_tags
-          + self.long_mode_tags
+          + self.long_high_profit_mode_tags
           + self.long_rapid_mode_tags
           + self.long_top_coins_mode_tags
           + self.long_scalp_mode_tags
@@ -2314,7 +2314,7 @@ class NostalgiaForInfinityX6(IStrategy):
           + self.long_pump_mode_tags
           + self.long_quick_mode_tags
           + self.long_rebuy_mode_tags
-          + self.long_mode_tags
+          + self.long_high_profit_mode_tags
           + self.long_rapid_mode_tags
           + self.long_grind_mode_tags
           + self.long_top_coins_mode_tags
@@ -2358,7 +2358,7 @@ class NostalgiaForInfinityX6(IStrategy):
             self.short_normal_mode_tags
             + self.short_pump_mode_tags
             + self.short_quick_mode_tags
-            + self.short_mode_tags
+            + self.short_high_profit_mode_tags
             + self.short_rapid_mode_tags
             + self.short_top_coins_mode_tags
             + self.short_scalp_mode_tags
@@ -2371,7 +2371,7 @@ class NostalgiaForInfinityX6(IStrategy):
             + self.short_pump_mode_tags
             + self.short_quick_mode_tags
             + self.short_rebuy_mode_tags
-            + self.short_mode_tags
+            + self.short_high_profit_mode_tags
             + self.short_rapid_mode_tags
             + self.short_grind_mode_tags
             + self.short_top_coins_mode_tags
@@ -3878,6 +3878,16 @@ class NostalgiaForInfinityX6(IStrategy):
         | (df["RSI_14_4h"] < 30.0)
         | (df["CMF_20_15m"] > -0.30)
         | (df["STOCHRSIk_14_14_3_3_1h"] < 50.0)
+      )
+      # 15m & 1h & 4h down move, 1h & 4h still high, 1d overbought
+      & (
+        (df["RSI_3_15m"] > 5.0)
+        | (df["RSI_3_1h"] > 50.0)
+        | (df["RSI_3_4h"] > 50.0)
+        | (df["RSI_14_1h"] < 40.0)
+        | (df["RSI_14_4h"] < 50.0)
+        | (df["AROONU_14_4h"] < 50.0)
+        | (df["ROC_9_1d"] < 70.0)
       )
       # 15m & 1h down move, 15m still not low enough, 1h & 4h high, 1h & 4h overbought
       & (
@@ -6730,6 +6740,17 @@ class NostalgiaForInfinityX6(IStrategy):
         | (df["AROONU_14_4h"] < 70.0)
         | (df["ROC_9_1d"] < 100.0)
       )
+      # 1h & 4h & 1d down move, 1h & 4h still not low enough, 1h & 4h downtrend, 1h still not low enough
+      & (
+        (df["RSI_3_1h"] > 15.0)
+        | (df["RSI_3_4h"] > 15.0)
+        | (df["RSI_3_1d"] > 15.0)
+        | (df["RSI_14_1h"] < 20.0)
+        | (df["RSI_14_4h"] < 20.0)
+        | (df["CMF_20_1h"] > -0.10)
+        | (df["CMF_20_4h"] > -0.20)
+        | (df["STOCHRSIk_14_14_3_3_1h"] < 20.0)
+      )
       # 1h & 4h & 1d down move, 1h & 4h still not low enough, 1d high & overbought
       & (
         (df["RSI_3_1h"] > 20.0)
@@ -7118,6 +7139,18 @@ class NostalgiaForInfinityX6(IStrategy):
         | (df["RSI_14_4h"] < 40.0)
         | (df["AROONU_14_1d"] < 85.0)
         | (df["ROC_9_4h"] > -30.0)
+        | (df["ROC_9_1d"] < 20.0)
+      )
+      # 1d green with top wick, 15m & 1h & 1d down move, 1h still not low enough, 4h still high, 1d overbought
+      & (
+        (df["change_pct_1d"] < 10.0)
+        | (df["top_wick_pct_1d"] < 10.0)
+        | (df["RSI_3_15m"] > 15.0)
+        | (df["RSI_3_1h"] > 30.0)
+        | (df["RSI_3_1d"] > 65.0)
+        | (df["RSI_14_1h"] < 30.0)
+        | (df["RSI_14_4h"] < 50.0)
+        | (df["STOCHRSIk_14_14_3_3_4h"] < 50.0)
         | (df["ROC_9_1d"] < 20.0)
       )
       # 1d green with top wick, 15m & 1h & 4h down move, 1h & 4h still high
@@ -9418,6 +9451,15 @@ class NostalgiaForInfinityX6(IStrategy):
               | (df["RSI_14_1h"] < 40.0)
               | (df["RSI_14_4h"] < 50.0)
               | (df["AROONU_14_1h"] < 70.0)
+            )
+            # 15m & 1h & 4h down move, 1h & 4h still high, 1h high
+            & (
+              (df["RSI_3_15m"] > 20.0)
+              | (df["RSI_3_1h"] > 40.0)
+              | (df["RSI_3_4h"] > 60.0)
+              | (df["RSI_14_1h"] < 40.0)
+              | (df["RSI_14_4h"] < 50.0)
+              | (df["STOCHRSIk_14_14_3_3_1h"] < 70.0)
             )
             # 15m & 1h & 4h down move, 15m still not low enough, 1h & 4h still high, 15m high
             & (
@@ -13508,6 +13550,10 @@ class NostalgiaForInfinityX6(IStrategy):
           )
           # 15m & 1h down move, 4h still high
           long_entry_logic.append((df["RSI_3_15m"] > 10.0) | (df["RSI_3_1h"] > 25.0) | (df["AROONU_14_4h"] < 50.0))
+          # 15m & 1h & 4h down move, 4h still high
+          long_entry_logic.append(
+            (df["RSI_3_15m"] > 10.0) | (df["RSI_3_1h"] > 30.0) | (df["RSI_3_4h"] > 30.0) | (df["AROONU_14_4h"] < 50.0)
+          )
           # 15m & 4h down move, 1h still high
           long_entry_logic.append(
             (df["RSI_3_15m"] > 10.0) | (df["RSI_3_4h"] > 15.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 40.0)
@@ -13620,6 +13666,10 @@ class NostalgiaForInfinityX6(IStrategy):
           long_entry_logic.append(
             (df["RSI_3_15m"] > 10.0) | (df["RSI_3_1h"] > 25.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 40.0)
           )
+          # 15m & 1h & 4h down move, 4h still high
+          long_entry_logic.append(
+            (df["RSI_3_15m"] > 10.0) | (df["RSI_3_1h"] > 30.0) | (df["RSI_3_4h"] > 30.0) | (df["AROONU_14_4h"] < 50.0)
+          )
           # 15m & 1h down move, 1h still high
           long_entry_logic.append(
             (df["RSI_3_15m"] > 10.0) | (df["RSI_3_1h"] > 55.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 60.0)
@@ -13669,6 +13719,10 @@ class NostalgiaForInfinityX6(IStrategy):
           # 15m down move, 15m still not low enough, 1h still high
           long_entry_logic.append(
             (df["RSI_3_15m"] > 15.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 30.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 50.0)
+          )
+          # 15m down move, 15m & 1h still high
+          long_entry_logic.append(
+            (df["RSI_3_15m"] > 20.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 40.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 50.0)
           )
           # 15m & 1h down move, 4h still high
           long_entry_logic.append(
@@ -13746,7 +13800,7 @@ class NostalgiaForInfinityX6(IStrategy):
           )
           # 15m & 1h & 4h high
           long_entry_logic.append(
-            (df["AROONU_14_15m"] < 70.0) | (df["AROONU_14_1h"] < 90.0) | (df["AROONU_14_4h"] < 90.0)
+            (df["AROONU_14_15m"] < 50.0) | (df["AROONU_14_1h"] < 90.0) | (df["AROONU_14_4h"] < 90.0)
           )
 
           # Logic
@@ -13866,6 +13920,8 @@ class NostalgiaForInfinityX6(IStrategy):
           long_entry_logic.append(
             (df["RSI_3_1h"] > 20.0) | (df["RSI_3_4h"] > 60.0) | (df["STOCHRSIk_14_14_3_3_4h"] < 85.0)
           )
+          # 1h & 4h down move, 4h high
+          long_entry_logic.append((df["RSI_3_1h"] > 45.0) | (df["AROONU_14_1h"] < 60.0) | (df["AROONU_14_4h"] < 90.0))
           # 4h & 1d down move, 15m still not low enough
           long_entry_logic.append(
             (df["RSI_3_4h"] > 5.0) | (df["RSI_3_1d"] > 15.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 20.0)
@@ -14048,6 +14104,10 @@ class NostalgiaForInfinityX6(IStrategy):
           )
           # 1h down move, 4h & 1d high
           long_entry_logic.append((df["RSI_3_1h"] > 60.0) | (df["RSI_14_4h"] < 70.0) | (df["RSI_14_1d"] < 80.0))
+          # 15m & 1h & 4h down move, 4h high
+          long_entry_logic.append(
+            (df["RSI_3_15m"] > 50.0) | (df["RSI_3_1h"] > 65.0) | (df["RSI_3_4h"] > 65.0) | (df["AROONU_14_4h"] < 85.0)
+          )
           # 4h down move, 15m high
           long_entry_logic.append((df["RSI_3_4h"] > 20.0) | (df["AROONU_14_15m"] < 80.0))
           # 4h down move, 1h high
