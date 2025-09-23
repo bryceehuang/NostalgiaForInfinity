@@ -66,32 +66,40 @@ fi
 # Strategy Config
 STRATEGY_NAME_CONFIG=""
 if [[ -z ${STRATEGY_NAME} ]]; then
-  STRATEGY_NAME_CONFIG="NostalgiaForInfinityX6"
+  STRATEGY_NAME_CONFIG="NostalgiaForInfinityX6_CC"
 else
   STRATEGY_NAME_CONFIG=${STRATEGY_NAME}
 fi
 
-export STRATEGY_VERSION=$(grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2)
+# Check strategy file exists
+STRATEGY_PATH="user_data/strategies/$STRATEGY_NAME_CONFIG.py"
+if [[ ! -f "$STRATEGY_PATH" ]]; then
+  echo "Error: Strategy file $STRATEGY_PATH not found"
+  exit 1
+fi
+
+export STRATEGY_VERSION=$(grep version "$STRATEGY_PATH" -A 1 | grep return | cut -d '"' -f 2)
 
 # Strategy Config
 STRATEGY_VERSION_CONFIG=""
 if [[ -z ${STRATEGY_VERSION} ]]; then
-  STRATEGY_VERSION_CONFIG="$(date -r $STRATEGY_NAME_CONFIG.py '+%Y_%m_%d-%H_%M')"
+  STRATEGY_VERSION_CONFIG="$(date -r "$STRATEGY_PATH" '+%Y_%m_%d-%H_%M')"
 else
-  grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2
-  STRATEGY_VERSION_CONFIG=$(grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2 | sed "s/\./-/g")
+  STRATEGY_VERSION_CONFIG=$(echo "$STRATEGY_VERSION" | sed "s/\./-/g")
 fi
 
 echo "# Running Backtests on Focus Group(s)"
 for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
 
   for EXCHANGE_RUN in ${EXCHANGE_CONFIG[*]}; do
-
-    TRADING_MODE_CONFIG=$TRADING_MODE_RUN
-
-    EXCHANGE_CONFIG=$EXCHANGE_RUN
-
-    EXCHANGE_CONFIG_FILE=tests/backtests/pairlist-backtest-static-focus-group-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-usdt.json
+    CURRENT_TRADING_MODE=$TRADING_MODE_RUN
+    CURRENT_EXCHANGE=$EXCHANGE_RUN
+    EXCHANGE_CONFIG_FILE="tests/backtests/pairlist-backtest-static-focus-group-${CURRENT_EXCHANGE}-${CURRENT_TRADING_MODE}-usdt.json"
+    
+    if [[ ! -f "$EXCHANGE_CONFIG_FILE" ]]; then
+      echo "Error: Config file not found: $EXCHANGE_CONFIG_FILE"
+      continue
+    fi
     if [[ -f "$EXCHANGE_CONFIG_FILE" ]]; then
 
       echo -e "\n---\n"
@@ -111,7 +119,7 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c $EXCHANGE_CONFIG_FILE \
         --log-file user_data/logs/backtesting-$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.log \
         --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json \
-        --cache none --breakdown day --timeframe-detail 1m --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
+        --cache none --breakdown day --timeframe-detail 1m --dry-run-wallet 1000 --stake-amount 300 --max-open-trades 10
       echo -e "\n\`\`\`\n\n---\n\n"
 
       freqtrade backtesting --export signals --eps \
@@ -121,17 +129,17 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c $EXCHANGE_CONFIG_FILE \
         --log-file user_data/logs/backtesting-$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.log \
         --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json \
-        --cache none --breakdown day --timeframe-detail 1m --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
+        --cache none --breakdown day --timeframe-detail 1m --dry-run-wallet 1000 --stake-amount 300 --max-open-trades 10
 
-      echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP ANALYSIS HUNTING BAD ENTRIES" | tr '[a-z]' '[A-Z]'
+      echo -e "\n### ${CURRENT_EXCHANGE} FOCUS GROUP ANALYSIS HUNTING BAD ENTRIES" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE}" with --eps
       echo -e "\n"
       echo -e "#### Running Command:\n\n\`\`\`sh\n"
       echo freqtrade backtesting-analysis --analysis-groups 0 1 2 3 4 5 \
         $TIMERANGE_CONFIG \
-        -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
+        -c configs/trading_mode-${CURRENT_TRADING_MODE}.json \
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE
+        -c ${EXCHANGE_CONFIG_FILE}
       echo -e "\n\`\`\`\n"
 
       freqtrade backtesting-analysis --analysis-groups 0 1 2 3 4 5 \
@@ -154,7 +162,8 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
       freqtrade plot-profit $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
         -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE
+        -c $EXCHANGE_CONFIG_FILE \
+        --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json
 
       echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP PLOT DATAFRAME" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE} with --eps"
@@ -171,13 +180,14 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
       freqtrade plot-dataframe $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
         -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE
+        -c $EXCHANGE_CONFIG_FILE \
+        --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json
 
       echo -e "\n${EXCHANGE_CONFIG} FOCUS GROUP ANALYSIS WITH PLOT FINISHED (with --eps )" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE} with --eps"
       echo -e "\n"
     fi
-    unset TRADING_MODE_CONFIG
+    # Removed unset to preserve variable for subsequent operations
   done
 
 done
