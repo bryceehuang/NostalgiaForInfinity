@@ -111,7 +111,7 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c $EXCHANGE_CONFIG_FILE \
         --log-file user_data/logs/backtesting-$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.log \
         --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json \
-        --cache none --breakdown day --timeframe-detail 1m --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
+        --cache none --breakdown day --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
       echo -e "\n\`\`\`\n\n---\n\n"
 
       freqtrade backtesting --export signals --eps \
@@ -121,7 +121,7 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c $EXCHANGE_CONFIG_FILE \
         --log-file user_data/logs/backtesting-$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.log \
         --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json \
-        --cache none --breakdown day --timeframe-detail 1m --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
+        --cache none --breakdown day --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
 
       echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP ANALYSIS HUNTING BAD ENTRIES" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE}" with --eps
