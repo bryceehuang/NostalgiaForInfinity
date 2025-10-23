@@ -86,7 +86,7 @@ class Backtest:
     cmdline = [
       "freqtrade",
       "backtesting",
-      "--strategy=NostalgiaForInfinityX6",
+      "--strategy=NostalgiaForInfinityX7",
       f"--timerange={start_date}-{end_date}",
       "--user-data-dir=user_data",
       "--config=configs/exampleconfig.json",
@@ -159,11 +159,20 @@ class Backtest:
       txt_path.write_text(ret.stdout.strip())
 
     # ---- Return structured BacktestResults ----
-    return BacktestResults(
+    backtest_results = BacktestResults(
       stdout=ret.stdout.strip(),
       stderr=ret.stderr.strip(),
       raw_data=results_data,
     )
+
+    # ---- Write CI JSON summary ----
+    if self.request.config.option.artifacts_path:
+      ci_json_path = artifacts_path / f"ci-results-{exchange}-{trading_mode}-{start_date}-{end_date}.json"
+      summary = {f"{start_date}-{end_date}": backtest_results._stats_pct}
+      ci_json_path.write_text(json.dumps(summary))
+
+    backtest_results.log_info()
+    return backtest_results
 
 
 @attr.s(frozen=True)
@@ -183,13 +192,13 @@ class BacktestResults:
     strategy_data = self.raw_data.get("strategy")
 
     if isinstance(strategy_data, dict):
-      # Expected structure: {"strategy": {"NostalgiaForInfinityX6": {...}}}
-      return strategy_data.get("NostalgiaForInfinityX6")
+      # Expected structure: {"strategy": {"NostalgiaForInfinityX7": {...}}}
+      return strategy_data.get("NostalgiaForInfinityX7")
 
-    elif isinstance(strategy_data, str) and strategy_data == "NostalgiaForInfinityX6":
-      # Fallback structure: {"strategy": "NostalgiaForInfinityX6"}
+    elif isinstance(strategy_data, str) and strategy_data == "NostalgiaForInfinityX7":
+      # Fallback structure: {"strategy": "NostalgiaForInfinityX7"}
       # Then use the top-level key instead
-      return self.raw_data.get("NostalgiaForInfinityX6")
+      return self.raw_data.get("NostalgiaForInfinityX7")
 
     else:
       raise TypeError(f"Unsupported 'strategy' value: {strategy_data!r}. Expected a dict or strategy name.")
