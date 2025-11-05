@@ -772,14 +772,14 @@ class NostalgiaForInfinityX7(IStrategy):
     # -------------------------------------------------------
     "short_entry_condition_501_enable": True,
     "short_entry_condition_502_enable": True,
-    # "short_entry_condition_503_enable": True,
-    # "short_entry_condition_504_enable": True,
-    # "short_entry_condition_541_enable": True,
+    "short_entry_condition_503_enable": True,
+    "short_entry_condition_504_enable": True,
+    "short_entry_condition_541_enable": True,
     "short_entry_condition_542_enable": True,
-    # "short_entry_condition_543_enable": True,
-    # "short_entry_condition_603_enable": True,
-    # "short_entry_condition_641_enable": True,
-    # "short_entry_condition_642_enable": True,
+    "short_entry_condition_543_enable": True,
+    "short_entry_condition_603_enable": True,
+    "short_entry_condition_641_enable": True,
+    "short_entry_condition_642_enable": True,
     # "short_entry_condition_661_enable": True,
   }
 
