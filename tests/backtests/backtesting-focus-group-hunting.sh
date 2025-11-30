@@ -25,12 +25,20 @@
 
 # If you need to change settings before run you can set environment variables like this
 
+# export STRATEGY_VERSION=v12-2-84 # dont use . in version there is a bug
 # export EXCHANGE=binance
 # export TRADING_MODE=futures
-# export STRATEGY_VERSION=v12-2-84 # dont use . in version there is a bug
 # export STRATEGY_NAME=NostalgiaForInfinityX7
 # export TIMERANGE=20240101-
 
+# 牛市（2023 年 1-6 月）
+# export TIMERANGE=20230101-20230630
+
+# 熊市（2022 年 5-11 月）
+# export TIMERANGE=20220501-20221130
+
+# 震荡市（2023 年 7-12 月）
+# export TIMERANGE=20230701-20231231
 
 date() {
   if type -p gdate >/dev/null; then
@@ -112,7 +120,7 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c $EXCHANGE_CONFIG_FILE \
         --log-file user_data/logs/backtesting-$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.log \
         --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json \
-        --cache none --breakdown day --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
+        --cache none --breakdown day --dry-run-wallet 1000 --stake-amount 200 --max-open-trades 6
       echo -e "\n\`\`\`\n\n---\n\n"
 
       freqtrade backtesting --export signals --eps \
@@ -122,7 +130,7 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c $EXCHANGE_CONFIG_FILE \
         --log-file user_data/logs/backtesting-$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.log \
         --export-filename user_data/backtest_results/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-focus-group-$TIMERANGE.json \
-        --cache none --breakdown day --dry-run-wallet 100000 --stake-amount 1000 --max-open-trades 100
+        --cache none --breakdown day --dry-run-wallet 1000 --stake-amount 200 --max-open-trades 6
 
       echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP ANALYSIS HUNTING BAD ENTRIES" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE}" with --eps
@@ -141,44 +149,44 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
         -c $EXCHANGE_CONFIG_FILE
 
-      echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP PLOT PROFIT" | tr '[a-z]' '[A-Z]'
-      echo -e "\n#### Trading Mode: $TRADING_MODE_CONFIG"
-      echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${EXCHANGE_CONFIG} ${TIMERANGE}"
-      echo -e "\n"
-      echo -e "#### Running Command:\n\n\`\`\`sh\n"
-      echo freqtrade plot-profit $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
-        -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
-        -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE \
-        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-profit-$TIMERANGE.html
-      echo -e "\n\`\`\`\n"
+      # echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP PLOT PROFIT" | tr '[a-z]' '[A-Z]'
+      # echo -e "\n#### Trading Mode: $TRADING_MODE_CONFIG"
+      # echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${EXCHANGE_CONFIG} ${TIMERANGE}"
+      # echo -e "\n"
+      # echo -e "#### Running Command:\n\n\`\`\`sh\n"
+      # echo freqtrade plot-profit $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
+      #   -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
+      #   -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
+      #   -c $EXCHANGE_CONFIG_FILE \
+      #   --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-profit-$TIMERANGE.html
+      # echo -e "\n\`\`\`\n"
 
-      freqtrade plot-profit $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
-        -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
-        -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE \
-        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-profit-$TIMERANGE.html
+      # freqtrade plot-profit $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
+      #   -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
+      #   -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
+      #   -c $EXCHANGE_CONFIG_FILE \
+      #   --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-profit-$TIMERANGE.html
 
-      echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP PLOT DATAFRAME" | tr '[a-z]' '[A-Z]'
-      echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE} with --eps"
-      echo -e "\n"
-      echo -e "#### Running Command:\n\n\`\`\`sh\n"
-      echo freqtrade plot-dataframe $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
-        -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
-        -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE \
-        --indicators1 EMA_200 \
-        --indicators2 RSI_3_1d RSI_14_1d RSI_3_4h RSI_14_4h RSI_14_1h RSI_3_1h RSI_14_15m RSI_3_15m CCI_20_15m CCI_20_1h CCI_20_4h short_entry_signal_2 short_entry_signal_1 long_entry_signal_2 long_entry_signal_1 \
-        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-dataframe-$TIMERANGE.html
-      echo -e "\n\`\`\`\n"
+      # echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP PLOT DATAFRAME" | tr '[a-z]' '[A-Z]'
+      # echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE} with --eps"
+      # echo -e "\n"
+      # echo -e "#### Running Command:\n\n\`\`\`sh\n"
+      # echo freqtrade plot-dataframe $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
+      #   -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
+      #   -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
+      #   -c $EXCHANGE_CONFIG_FILE \
+      #   --indicators1 EMA_200 \
+      #   --indicators2 RSI_3_1d RSI_14_1d RSI_3_4h RSI_14_4h RSI_14_1h RSI_3_1h RSI_14_15m RSI_3_15m CCI_20_15m CCI_20_1h CCI_20_4h short_entry_signal_2 short_entry_signal_1 long_entry_signal_2 long_entry_signal_1 \
+      #   --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-dataframe-$TIMERANGE.html
+      # echo -e "\n\`\`\`\n"
 
-      freqtrade plot-dataframe $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
-        -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
-        -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE \
-        --indicators1 EMA_200 \
-        --indicators2 RSI_3_1d RSI_14_1d RSI_3_4h RSI_14_4h RSI_14_1h RSI_3_1h RSI_14_15m RSI_3_15m CCI_20_15m CCI_20_1h CCI_20_4h short_entry_signal_2 short_entry_signal_1 long_entry_signal_2 long_entry_signal_1 \
-        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-dataframe-$TIMERANGE.html
+      # freqtrade plot-dataframe $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
+      #   -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
+      #   -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
+      #   -c $EXCHANGE_CONFIG_FILE \
+      #   --indicators1 EMA_200 \
+      #   --indicators2 RSI_3_1d RSI_14_1d RSI_3_4h RSI_14_4h RSI_14_1h RSI_3_1h RSI_14_15m RSI_3_15m CCI_20_15m CCI_20_1h CCI_20_4h short_entry_signal_2 short_entry_signal_1 long_entry_signal_2 long_entry_signal_1 \
+      #   --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-dataframe-$TIMERANGE.html
 
       echo -e "\n${EXCHANGE_CONFIG} FOCUS GROUP ANALYSIS WITH PLOT FINISHED (with --eps )" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE} with --eps"
