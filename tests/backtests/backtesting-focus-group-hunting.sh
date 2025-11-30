@@ -26,10 +26,11 @@
 # If you need to change settings before run you can set environment variables like this
 
 # export EXCHANGE=binance
-# export TRADING_MODE=spot
-# export STRATEGY_VERSION=v15-0-442 # dont use . in version there is a bug
+# export TRADING_MODE=futures
+# export STRATEGY_VERSION=v12-2-84 # dont use . in version there is a bug
 # export STRATEGY_NAME=NostalgiaForInfinityX7
-# export TIMERANGE=20230801-
+# export TIMERANGE=20240101-
+
 
 date() {
   if type -p gdate >/dev/null; then
@@ -42,7 +43,7 @@ date() {
 # Exchange Config
 EXCHANGE_CONFIG=""
 if [[ -z ${EXCHANGE} ]]; then
-  EXCHANGE_CONFIG="binance gateio okx"
+  EXCHANGE_CONFIG="binance"
 else
   EXCHANGE_CONFIG=${EXCHANGE}
 fi
@@ -71,15 +72,15 @@ else
   STRATEGY_NAME_CONFIG=${STRATEGY_NAME}
 fi
 
-export STRATEGY_VERSION=$(grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2)
+export STRATEGY_VERSION=$(grep "def version(self)" $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2)
 
 # Strategy Config
 STRATEGY_VERSION_CONFIG=""
 if [[ -z ${STRATEGY_VERSION} ]]; then
   STRATEGY_VERSION_CONFIG="$(date -r $STRATEGY_NAME_CONFIG.py '+%Y_%m_%d-%H_%M')"
 else
-  grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2
-  STRATEGY_VERSION_CONFIG=$(grep version $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2 | sed "s/\./-/g")
+  grep "def version(self)" $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2
+  STRATEGY_VERSION_CONFIG=$(grep "def version(self)" $STRATEGY_NAME_CONFIG.py -A 1 | grep return | cut -d '"' -f 2 | sed "s/\./-/g")
 fi
 
 echo "# Running Backtests on Focus Group(s)"
@@ -148,13 +149,15 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
       echo freqtrade plot-profit $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
         -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE
+        -c $EXCHANGE_CONFIG_FILE \
+        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-profit-$TIMERANGE.html
       echo -e "\n\`\`\`\n"
 
       freqtrade plot-profit $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
         -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE
+        -c $EXCHANGE_CONFIG_FILE \
+        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-profit-$TIMERANGE.html
 
       echo -e "\n### ${EXCHANGE_CONFIG} FOCUS GROUP PLOT DATAFRAME" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE} with --eps"
@@ -165,13 +168,17 @@ for TRADING_MODE_RUN in ${TRADING_MODE_CONFIG[*]}; do
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
         -c $EXCHANGE_CONFIG_FILE \
         --indicators1 EMA_200 \
-        --indicators2 RSI_3_1d RSI_14_1d RSI_3_4h RSI_14_4h RSI_14_1h RSI_3_1h RSI_14_15m RSI_3_15m CCI_20_15m CCI_20_1h CCI_20_4h short_entry_signal_2 short_entry_signal_1 long_entry_signal_2 long_entry_signal_1
+        --indicators2 RSI_3_1d RSI_14_1d RSI_3_4h RSI_14_4h RSI_14_1h RSI_3_1h RSI_14_15m RSI_3_15m CCI_20_15m CCI_20_1h CCI_20_4h short_entry_signal_2 short_entry_signal_1 long_entry_signal_2 long_entry_signal_1 \
+        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-dataframe-$TIMERANGE.html
       echo -e "\n\`\`\`\n"
 
       freqtrade plot-dataframe $TIMERANGE_CONFIG --strategy $STRATEGY_NAME_CONFIG \
         -c configs/trading_mode-$TRADING_MODE_CONFIG.json \
         -c configs/exampleconfig.json -c configs/exampleconfig_secret.json \
-        -c $EXCHANGE_CONFIG_FILE
+        -c $EXCHANGE_CONFIG_FILE \
+        --indicators1 EMA_200 \
+        --indicators2 RSI_3_1d RSI_14_1d RSI_3_4h RSI_14_4h RSI_14_1h RSI_3_1h RSI_14_15m RSI_3_15m CCI_20_15m CCI_20_1h CCI_20_4h short_entry_signal_2 short_entry_signal_1 long_entry_signal_2 long_entry_signal_1 \
+        --export-filename user_data/plot/$STRATEGY_NAME_CONFIG-$STRATEGY_VERSION_CONFIG-$EXCHANGE_CONFIG-$TRADING_MODE_CONFIG-dataframe-$TIMERANGE.html
 
       echo -e "\n${EXCHANGE_CONFIG} FOCUS GROUP ANALYSIS WITH PLOT FINISHED (with --eps )" | tr '[a-z]' '[A-Z]'
       echo -e "\n${STRATEGY_NAME_CONFIG} ${STRATEGY_VERSION} ${TIMERANGE} with --eps"

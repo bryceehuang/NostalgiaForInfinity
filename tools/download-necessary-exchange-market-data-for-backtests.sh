@@ -9,11 +9,11 @@ TIMEFRAME="5m"
 HELPER_TIME_FRAMES="1d 4h 1h 15m 1m"
 # EXAMPLE
 # TRADING_MODE="spot futures"
-TRADING_MODE="spot"
+TRADING_MODE="spot futures"
 # EXAMPLE
 # EXCHANGE="binance kucoin okx"
 EXCHANGE="binance kucoin"
-URL="https://github.com/DigiTuccar/HistoricalDataForTradeBacktest.git"
+URL="https://github.com/iterativv/NostalgiaForInfinityData.git"
 
 if [ -d $MAIN_DATA_DIRECTORY ]
     then
