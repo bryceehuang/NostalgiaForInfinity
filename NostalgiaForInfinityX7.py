@@ -173,9 +173,9 @@ class NostalgiaForInfinityX7(IStrategy):
   short_scalp_mode_name = "short_scalp"
 
   is_futures_mode = False
-  futures_mode_leverage = 5.0
-  futures_mode_leverage_rebuy_mode = 5.0
-  futures_mode_leverage_grind_mode = 5.0
+  futures_mode_leverage = 3.0
+  futures_mode_leverage_rebuy_mode = 3.0
+  futures_mode_leverage_grind_mode = 3.0
 
   # Limit the number of long/short trades for futures (0 for no limit)
   futures_max_open_trades_long = 0
@@ -742,8 +742,8 @@ class NostalgiaForInfinityX7(IStrategy):
     # Enable/Disable conditions
     # -------------------------------------------------------
     "long_entry_condition_1_enable": True,
-    # "long_entry_condition_2_enable": True,
-    # "long_entry_condition_3_enable": True,
+    "long_entry_condition_2_enable": True,
+    "long_entry_condition_3_enable": True,
     "long_entry_condition_4_enable": True,
     "long_entry_condition_5_enable": True,
     "long_entry_condition_6_enable": True,
@@ -761,7 +761,7 @@ class NostalgiaForInfinityX7(IStrategy):
     "long_entry_condition_102_enable": True,
     "long_entry_condition_103_enable": True,
     "long_entry_condition_104_enable": True,
-    # "long_entry_condition_120_enable": True,
+    "long_entry_condition_120_enable": True,
     "long_entry_condition_141_enable": True,
     "long_entry_condition_142_enable": True,
     "long_entry_condition_143_enable": True,
@@ -769,7 +769,7 @@ class NostalgiaForInfinityX7(IStrategy):
     "long_entry_condition_145_enable": True,
     "long_entry_condition_161_enable": True,
     "long_entry_condition_162_enable": True,
-    # "long_entry_condition_163_enable": True,
+    "long_entry_condition_163_enable": True,
   }
 
   short_entry_signal_params = {
@@ -777,14 +777,14 @@ class NostalgiaForInfinityX7(IStrategy):
     # -------------------------------------------------------
     "short_entry_condition_501_enable": True,
     "short_entry_condition_502_enable": True,
-    "short_entry_condition_503_enable": True,
-    "short_entry_condition_504_enable": True,
-    "short_entry_condition_541_enable": True,
+    # "short_entry_condition_503_enable": True,
+    # "short_entry_condition_504_enable": True,
+    # "short_entry_condition_541_enable": True,
     "short_entry_condition_542_enable": True,
-    "short_entry_condition_543_enable": True,
-    "short_entry_condition_603_enable": True,
-    "short_entry_condition_641_enable": True,
-    "short_entry_condition_642_enable": True,
+    # "short_entry_condition_543_enable": True,
+    # "short_entry_condition_603_enable": True,
+    # "short_entry_condition_641_enable": True,
+    # "short_entry_condition_642_enable": True,
     # "short_entry_condition_661_enable": True,
   }
 
