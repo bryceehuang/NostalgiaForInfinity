@@ -785,7 +785,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # "short_entry_condition_603_enable": True,
     # "short_entry_condition_641_enable": True,
     # "short_entry_condition_642_enable": True,
-    # "short_entry_condition_661_enable": True,
+    "short_entry_condition_661_enable": True,
   }
 
   #############################################################
