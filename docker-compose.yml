@@ -30,7 +30,7 @@ services:
     environment:
       - HTTP_PROXY=http://host.docker.internal:7897
       - HTTPS_PROXY=http://host.docker.internal:7897
-      - NO_PROXY=localhost,127.0.0.1
+      - NO_PROXY=localhost,127.0.0.1,ws.okx.com
     ports:
       - "${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}:${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}"
     # Default command used when running `docker compose up`

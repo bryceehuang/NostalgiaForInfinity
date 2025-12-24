@@ -1,12 +1,31 @@
 ---
+# docker-compose.live.yml
 
 services:
-  freqtrade:
-    container_name: ${FREQTRADE__BOT_NAME:-Example_Test_Account}_${FREQTRADE__EXCHANGE__NAME:-binance}_${FREQTRADE__TRADING_MODE:-futures}-${FREQTRADE__STRATEGY:-NostalgiaForInfinityX7}-live
+  binance:
+    extends:
+      file: docker-compose.base.yml
+      service: common
+    container_name: ft_binance_live
     ports:
-      - "${FREQTRADE__API_SERVER__LISTEN_PORT_LIVE:-8081}:${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}"
+      - "${PORT_BINANCE_LIVE:-8082}:8080"
     command: >
       trade
-      --db-url sqlite:////freqtrade/user_data/${FREQTRADE__BOT_NAME:-Example_Test_Account}_${FREQTRADE__EXCHANGE__NAME:-binance}_${FREQTRADE__TRADING_MODE:-futures}-tradesv3.sqlite
-      --log-file user_data/logs/${FREQTRADE__BOT_NAME:-Example_Test_Account}-${FREQTRADE__EXCHANGE__NAME:-binance}-${FREQTRADE__STRATEGY:-NostalgiaForInfinityX7}-${FREQTRADE__TRADING_MODE:-futures}-live.log
+      --config user_data/config-binance.json
+      --db-url sqlite:////freqtrade/user_data/tradesv3_binance_live.sqlite
+      --log-file user_data/logs/binance_live.log
+      --strategy-path .
+
+  okx:
+    extends:
+      file: docker-compose.base.yml
+      service: common
+    container_name: ft_okx_live
+    ports:
+      - "${PORT_OKX_LIVE:-8083}:8080"
+    command: >
+      trade
+      --config user_data/config-okx.json
+      --db-url sqlite:////freqtrade/user_data/tradesv3_okx_live.sqlite
+      --log-file user_data/logs/okx_live.log
       --strategy-path .

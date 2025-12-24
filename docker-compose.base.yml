@@ -1,32 +1,27 @@
 ---
-
-x-common-settings:
-  &common-settings
-  image: freqtradeorg/freqtrade:stable
-  build:
-    context: .
-    dockerfile: "./docker/Dockerfile.custom"
-  restart: unless-stopped
-  volumes:
-    - "./user_data:/freqtrade/user_data"
-    - "./user_data/data:/freqtrade/user_data/data"
-    - "./configs:/freqtrade/configs"
-    - "./${FREQTRADE__STRATEGY:-NostalgiaForInfinityX7}.py:/freqtrade/${FREQTRADE__STRATEGY:-NostalgiaForInfinityX7}.py"
-  healthcheck:
-    test: ["CMD", "curl", "-f", "http://localhost:${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}"]
-    interval: 1m30s
-    timeout: 10s
-    retries: 3
-    start_period: 40s
-    start_interval: 5s
-  env_file:
-    - path: .env
-      required: false # default true
-  environment:
-    - HTTP_PROXY=http://host.docker.internal:7897
-    - HTTPS_PROXY=http://host.docker.internal:7897
-    - NO_PROXY=localhost,127.0.0.1
+# docker-compose.base.yml
 
 services:
-  freqtrade:
-    <<: *common-settings
+  # 这是一个服务模板，不会被直接启动
+  common:
+    image: freqtradeorg/freqtrade:stable
+    build:
+      context: .
+      dockerfile: "./docker/Dockerfile.custom"
+    restart: unless-stopped
+    volumes:
+      - "./user_data:/freqtrade/user_data"
+      - "./user_data/data:/freqtrade/user_data/data"
+      - "./configs:/freqtrade/configs"
+      - "./${FREQTRADE__STRATEGY:-NostalgiaForInfinityX7}.py:/freqtrade/${FREQTRADE__STRATEGY:-NostalgiaForInfinityX7}.py"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+    environment:
+      - HTTP_PROXY=http://host.docker.internal:7897
+      - HTTPS_PROXY=http://host.docker.internal:7897
+

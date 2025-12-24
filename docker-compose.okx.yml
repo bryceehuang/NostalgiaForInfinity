@@ -1,0 +1,14 @@
+---
+# docker-compose.okx.yml
+
+services:
+  okx:
+    extends:
+      file: docker-compose.base.yml
+      service: common
+    deploy:
+      replicas: 1
+    env_file:
+      - .env.okx
+    environment:
+      - NO_PROXY=localhost,127.0.0.1,ws.okx.com

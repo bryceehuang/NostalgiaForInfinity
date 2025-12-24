@@ -1,0 +1,14 @@
+---
+# docker-compose.binance.yml
+
+services:
+  binance:
+    extends:
+      file: docker-compose.base.yml
+      service: common
+    deploy:
+      replicas: 1
+    env_file:
+      - .env.binance
+    environment:
+      - NO_PROXY=localhost,127.0.0.1,api.binance.com,fapi.binance.com

@@ -105,6 +105,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.binance
+.env.okx
 .venv
 env/
 venv/
