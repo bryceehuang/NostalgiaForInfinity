@@ -1,0 +1,1 @@
+/Users/bryce/Documents/projects/NostalgiaForInfinity/HardmanV1.py
